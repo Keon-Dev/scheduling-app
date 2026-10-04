@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_04_002414) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_04_022442) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "user_identities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "provider", null: false
+    t.string "uid", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "workspace_id"
+    t.index ["provider", "uid", "workspace_id"], name: "index_user_identities_on_provider_and_uid_and_workspace_id", unique: true, nulls_not_distinct: true
+    t.index ["user_id", "provider", "workspace_id"], name: "index_user_identities_on_user_id_and_provider_and_workspace_id", unique: true, nulls_not_distinct: true
+    t.index ["user_id"], name: "index_user_identities_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -23,4 +35,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_002414) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["stripe_customer_id"], name: "index_users_on_stripe_customer_id", unique: true
   end
+
+  add_foreign_key "user_identities", "users", on_delete: :cascade
 end
