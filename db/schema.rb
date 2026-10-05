@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_04_022442) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_04_043534) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "events", force: :cascade do |t|
+    t.datetime "confirmed_end_at"
+    t.bigint "confirmed_slot_id"
+    t.datetime "confirmed_start_at"
+    t.datetime "created_at", null: false
+    t.datetime "deadline"
+    t.text "description"
+    t.boolean "editable_by_anyone", default: true, null: false
+    t.integer "expected_participant_count"
+    t.integer "granularity", default: 0, null: false
+    t.bigint "owner_user_id"
+    t.string "public_token", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_user_id"], name: "index_events_on_owner_user_id"
+    t.index ["public_token"], name: "index_events_on_public_token", unique: true
+  end
+
+  create_table "slots", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "end_at", null: false
+    t.bigint "event_id", null: false
+    t.datetime "start_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "start_at"], name: "index_slots_on_event_id_and_start_at", unique: true
+    t.index ["event_id"], name: "index_slots_on_event_id"
+  end
 
   create_table "user_identities", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -36,5 +64,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_022442) do
     t.index ["stripe_customer_id"], name: "index_users_on_stripe_customer_id", unique: true
   end
 
+  add_foreign_key "events", "slots", column: "confirmed_slot_id", on_delete: :nullify
+  add_foreign_key "events", "users", column: "owner_user_id", on_delete: :nullify
+  add_foreign_key "slots", "events", on_delete: :cascade
   add_foreign_key "user_identities", "users", on_delete: :cascade
 end
