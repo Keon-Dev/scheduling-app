@@ -1,0 +1,10 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  email: tanaka@example.com
+  name: 田中
+
+two:
+  email: suzuki@example.com
+  name: 鈴木
+
